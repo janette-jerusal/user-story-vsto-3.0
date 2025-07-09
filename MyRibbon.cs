@@ -1,6 +1,8 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.Office.Core;
+using System.Reflection;
+using System.IO;
 
 namespace UserStorySimilarityAddIn
 {
@@ -10,12 +12,12 @@ namespace UserStorySimilarityAddIn
 
         public string GetCustomUI(string ribbonID)
         {
-            return System.IO.File.ReadAllText(
-                System.IO.Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "Ribbon.xml"
-                )
-            );
+            var assembly = Assembly.GetExecutingAssembly();
+            using (var stream = assembly.GetManifestResourceStream("UserStorySimilarityAddIn.MyRibbon.xml"))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         public void Ribbon_Load(IRibbonUI ribbonUI)
@@ -26,9 +28,7 @@ namespace UserStorySimilarityAddIn
         public void OnCompareClick(IRibbonControl control)
         {
             MessageBox.Show("Compare button clicked!");
-            // TODO: Replace with your real form or logic here
-            // new SimilarityForm().ShowDialog();
+            new SimilarityForm().ShowDialog(); // Make sure SimilarityForm inherits from Form
         }
     }
 }
-
