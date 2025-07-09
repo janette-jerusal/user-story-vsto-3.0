@@ -18,8 +18,7 @@ namespace UserStorySimilarityAddIn
 
         protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
-            ribbon = new MyRibbon();
-            return ribbon;
+            return new MyRibbon();
         }
 
         #region VSTO generated code
