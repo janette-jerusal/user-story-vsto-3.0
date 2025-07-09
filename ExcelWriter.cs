@@ -1,25 +1,30 @@
-using System;
-using System.Data;
-using System.IO;
 using OfficeOpenXml;
+using System.Collections.Generic;
+using System.IO;
 
 namespace UserStorySimilarityAddIn
 {
     public static class ExcelWriter
     {
-        public static string WriteResults(DataTable table)
+        public static void WriteResults(string outputPath, List<(string, string, double)> results)
         {
-            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "UserStoryResults.xlsx");
-
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var package = new ExcelPackage())
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Similarity Results");
+
+            worksheet.Cells[1, 1].Value = "Story A";
+            worksheet.Cells[1, 2].Value = "Story B";
+            worksheet.Cells[1, 3].Value = "Similarity Score";
+
+            for (int i = 0; i < results.Count; i++)
             {
-                var sheet = package.Workbook.Worksheets.Add("Matches");
-                sheet.Cells["A1"].LoadFromDataTable(table, true);
-                package.SaveAs(new FileInfo(filePath));
+                worksheet.Cells[i + 2, 1].Value = results[i].Item1;
+                worksheet.Cells[i + 2, 2].Value = results[i].Item2;
+                worksheet.Cells[i + 2, 3].Value = results[i].Item3;
             }
 
-            return filePath;
+            package.SaveAs(new FileInfo(outputPath));
         }
     }
 }
