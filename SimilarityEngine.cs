@@ -1,61 +1,45 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
-using Accord.MachineLearning.Text;
-using Accord.Statistics.Analysis;
+using System.Linq;
 
 namespace UserStorySimilarityAddIn
 {
-    public class SimilarityEngine
+    public static class SimilarityEngine
     {
-        public static DataTable ComputeSimilarity(DataTable df1, DataTable df2, float threshold)
+        public static List<(string, string, double)> ComputeSimilarities(List<string> userStories)
         {
-            var combined = new List<string>();
-            foreach (DataRow row in df1.Rows) combined.Add(row["Desc"].ToString());
-            foreach (DataRow row in df2.Rows) combined.Add(row["Desc"].ToString());
+            var similarities = new List<(string, string, double)>();
 
-            var tfidf = new TfIdfVectorizer();
-            double[][] vectors = tfidf.Transform(combined.ToArray());
-
-            int split = df1.Rows.Count;
-            var resultTable = new DataTable();
-            resultTable.Columns.Add("Story A ID");
-            resultTable.Columns.Add("Story A Desc");
-            resultTable.Columns.Add("Story B ID");
-            resultTable.Columns.Add("Story B Desc");
-            resultTable.Columns.Add("Similarity Score");
-
-            for (int i = 0; i < split; i++)
+            for (int i = 0; i < userStories.Count; i++)
             {
-                for (int j = split; j < combined.Count; j++)
+                for (int j = i + 1; j < userStories.Count; j++)
                 {
-                    double score = Cosine(vectors[i], vectors[j]);
-                    if (score >= threshold)
-                    {
-                        resultTable.Rows.Add(
-                            df1.Rows[i]["ID"],
-                            df1.Rows[i]["Desc"],
-                            df2.Rows[j - split]["ID"],
-                            df2.Rows[j - split]["Desc"],
-                            Math.Round(score, 3)
-                        );
-                    }
+                    double sim = CalculateCosineSimilarity(userStories[i], userStories[j]);
+                    similarities.Add((userStories[i], userStories[j], sim));
                 }
             }
 
-            return resultTable;
+            return similarities;
         }
 
-        private static double Cosine(double[] v1, double[] v2)
+        private static double CalculateCosineSimilarity(string text1, string text2)
         {
-            double dot = 0, norm1 = 0, norm2 = 0;
-            for (int i = 0; i < v1.Length; i++)
+            var words1 = text1.Split(' ').GroupBy(w => w).ToDictionary(g => g.Key, g => g.Count());
+            var words2 = text2.Split(' ').GroupBy(w => w).ToDictionary(g => g.Key, g => g.Count());
+
+            var allWords = words1.Keys.Union(words2.Keys);
+            double dot = 0, mag1 = 0, mag2 = 0;
+
+            foreach (var word in allWords)
             {
-                dot += v1[i] * v2[i];
-                norm1 += v1[i] * v1[i];
-                norm2 += v2[i] * v2[i];
+                words1.TryGetValue(word, out int freq1);
+                words2.TryGetValue(word, out int freq2);
+
+                dot += freq1 * freq2;
+                mag1 += freq1 * freq1;
+                mag2 += freq2 * freq2;
             }
-            return dot / (Math.Sqrt(norm1) * Math.Sqrt(norm2) + 1e-10);
+
+            return mag1 == 0 || mag2 == 0 ? 0 : dot / (System.Math.Sqrt(mag1) * System.Math.Sqrt(mag2));
         }
     }
 }
