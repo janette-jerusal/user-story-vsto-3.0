@@ -1,0 +1,19 @@
+public string GetCustomUI(string ribbonID)
+{
+    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+
+    // Diagnostic: show all resource names
+    var resources = assembly.GetManifestResourceNames();
+    System.Windows.Forms.MessageBox.Show(
+        "Available resources:\n" + string.Join("\n", resources),
+        "Debug: Embedded Resources");
+
+    // ✅ Replace this string with the EXACT match shown in the message box popup
+    string resourceName = "UserStorySimilarityAddIn.MyRibbon.xml";
+
+    using (var stream = assembly.GetManifestResourceStream(resourceName))
+    using (var reader = new System.IO.StreamReader(stream))
+    {
+        return reader.ReadToEnd();
+    }
+}
