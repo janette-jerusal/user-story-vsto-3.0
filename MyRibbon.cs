@@ -1,17 +1,34 @@
 using System;
 using System.Windows.Forms;
-using Microsoft.Office.Tools.Ribbon;
+using Microsoft.Office.Core;
 
 namespace UserStorySimilarityAddIn
 {
-    public partial class MyRibbon
+    public class MyRibbon : IRibbonExtensibility
     {
-        private void MyRibbon_Load(object sender, RibbonUIEventArgs e) { }
+        private IRibbonUI ribbon;
 
-        private void btnCompare_Click(object sender, RibbonControlEventArgs e)
+        public string GetCustomUI(string ribbonID)
         {
-            SimilarityForm form = new SimilarityForm();
-            form.Show();
+            return System.IO.File.ReadAllText(
+                System.IO.Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Ribbon.xml"
+                )
+            );
+        }
+
+        public void Ribbon_Load(IRibbonUI ribbonUI)
+        {
+            this.ribbon = ribbonUI;
+        }
+
+        public void OnCompareClick(IRibbonControl control)
+        {
+            MessageBox.Show("Compare button clicked!");
+            // TODO: Replace with your real form or logic here
+            // new SimilarityForm().ShowDialog();
         }
     }
 }
+
