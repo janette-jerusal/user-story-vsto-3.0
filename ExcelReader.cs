@@ -1,36 +1,27 @@
-using System.Data;
-using System.IO;
+using System.Collections.Generic;
 using OfficeOpenXml;
+using System.IO;
 
 namespace UserStorySimilarityAddIn
 {
     public static class ExcelReader
     {
-        public static DataTable ReadUserStories(string path)
+        public static List<string> ReadUserStories(string filePath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var package = new ExcelPackage(new FileInfo(path)))
-            {
-                var ws = package.Workbook.Worksheets[0];
-                return ws.ToDataTable();
-            }
-        }
 
-        private static DataTable ToDataTable(this ExcelWorksheet ws)
-        {
-            var tbl = new DataTable();
-            foreach (var cell in ws.Cells[1, 1, 1, ws.Dimension.End.Column])
-                tbl.Columns.Add(cell.Text);
+            var stories = new List<string>();
+            using var package = new ExcelPackage(new FileInfo(filePath));
+            var worksheet = package.Workbook.Worksheets[0];
 
-            for (int r = 2; r <= ws.Dimension.End.Row; r++)
+            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
             {
-                var row = tbl.NewRow();
-                for (int c = 1; c <= ws.Dimension.End.Column; c++)
-                    row[c - 1] = ws.Cells[r, c].Text;
-                tbl.Rows.Add(row);
+                var cellValue = worksheet.Cells[row, 1].Text;
+                if (!string.IsNullOrWhiteSpace(cellValue))
+                    stories.Add(cellValue);
             }
 
-            return tbl;
+            return stories;
         }
     }
 }
