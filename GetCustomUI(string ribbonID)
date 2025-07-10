@@ -15,40 +15,24 @@ namespace UserStorySimilarityAddIn
             MessageBox.Show("Ribbon Constructor Called");
         }
 
-        public string GetCustomUI(string ribbonID)
+      public string GetCustomUI(string ribbonID)
+{
+    MessageBox.Show("GetCustomUI triggered!");
+
+    var assembly = Assembly.GetExecutingAssembly();
+    var resources = assembly.GetManifestResourceNames();
+    MessageBox.Show("Resources:\n" + string.Join("\n", resources));
+
+    foreach (var res in resources)
+    {
+        if (res.Contains("MvRibbon"))
         {
-            try
-            {
-                var assembly = Assembly.GetExecutingAssembly();
-                var resources = assembly.GetManifestResourceNames();
-                MessageBox.Show("Embedded Resources:\n" + string.Join("\n", resources));
-
-                using (Stream stream = assembly.GetManifestResourceStream("UserStorySimilarityAddIn.MvRibbon.xml"))
-                {
-                    if (stream == null)
-                    {
-                        MessageBox.Show("Ribbon XML not found!");
-                        return null;
-                    }
-
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show("Error loading ribbon: " + ex.Message);
-                return null;
-            }
+            using (Stream stream = assembly.GetManifestResourceStream(res))
+            using (StreamReader reader = new StreamReader(stream))
+                return reader.ReadToEnd();
         }
-
-        public void OnLoad(IRibbonUI ribbonUI)
-        {
-            this.ribbon = ribbonUI;
-        }
-
-        // You can add button callback methods here too
     }
+
+    MessageBox.Show("MvRibbon.xml not found in resources.");
+    return null;
 }
