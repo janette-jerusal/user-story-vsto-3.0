@@ -17,10 +17,10 @@ namespace UserStorySimilarityAddIn
 
         public string GetCustomUI(string ribbonID)
         {
+            MessageBox.Show("GetCustomUI TRIGGERED");
+
             try
             {
-                MessageBox.Show("Ribbon Constructor Called");
-
                 var assembly = Assembly.GetExecutingAssembly();
                 MessageBox.Show("Assembly Loaded");
 
@@ -31,19 +31,27 @@ namespace UserStorySimilarityAddIn
                 {
                     if (stream == null)
                     {
-                        MessageBox.Show("Ribbon XML not found!");
+                        MessageBox.Show("MvRibbon.xml not found!");
                         return null;
                     }
 
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
                 }
             }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Error loading ribbon: " + ex.Message);
+                return null;
+            }
         }
-        catch (System.Exception ex)
+
+        public void OnLoad(IRibbonUI ribbonUI)
         {
-            MessageBox.Show("Error loading ribbon: " + ex.Message);
-            return null;
+            this.ribbon = ribbonUI;
         }
     }
+}
+
