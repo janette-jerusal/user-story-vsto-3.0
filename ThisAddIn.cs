@@ -7,23 +7,19 @@ namespace UserStorySimilarityAddIn
 {
     public partial class ThisAddIn
     {
-        private MyRibbon ribbon;
+        protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
+        {
+            return new MyRibbon(); // Excel uses this
+        }
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
-            // Manual test to invoke and verify ribbon loading
-            ribbon = new MyRibbon();
-            string result = ribbon.GetCustomUI("MyRibbon");
-            System.Windows.Forms.MessageBox.Show("Ribbon XML Loaded:\n\n" + result);
+            // Optional: useful debug only, but remove later
+            // MessageBox.Show("ThisAddIn Startup triggered.");
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
-        }
-
-        protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
-        {
-            return new MyRibbon();
         }
 
         #region VSTO generated code
@@ -37,3 +33,4 @@ namespace UserStorySimilarityAddIn
         #endregion
     }
 }
+
