@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Office.Tools.Excel;
 using Excel = Microsoft.Office.Interop.Excel;
+using Microsoft.Office.Core;
 
 namespace UserStorySimilarityAddIn
 {
@@ -20,7 +21,7 @@ namespace UserStorySimilarityAddIn
         {
         }
 
-        protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
+        protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
             return new MyRibbon();
         }
@@ -36,4 +37,3 @@ namespace UserStorySimilarityAddIn
         #endregion
     }
 }
-
