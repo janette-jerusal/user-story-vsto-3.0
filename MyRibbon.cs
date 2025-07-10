@@ -1,8 +1,7 @@
-using System;
-using System.Windows.Forms;
-using Microsoft.Office.Core;
 using System.Reflection;
 using System.IO;
+using System.Windows.Forms;
+using Microsoft.Office.Core;
 
 namespace UserStorySimilarityAddIn
 {
@@ -10,25 +9,46 @@ namespace UserStorySimilarityAddIn
     {
         private IRibbonUI ribbon;
 
+        public MyRibbon()
+        {
+            // Confirm constructor is triggered
+            MessageBox.Show("Ribbon Constructor Called");
+        }
+
         public string GetCustomUI(string ribbonID)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            using (var stream = assembly.GetManifestResourceStream("UserStorySimilarityAddIn.MyRibbon.xml"))
-            using (var reader = new StreamReader(stream))
+            try
             {
-                return reader.ReadToEnd();
+                var assembly = Assembly.GetExecutingAssembly();
+                var resources = assembly.GetManifestResourceNames();
+                MessageBox.Show("Embedded Resources:\n" + string.Join("\n", resources));
+
+                using (Stream stream = assembly.GetManifestResourceStream("UserStorySimilarityAddIn.MyRibbon.xml"))
+                {
+                    if (stream == null)
+                    {
+                        MessageBox.Show("Ribbon XML not found!");
+                        return null;
+                    }
+
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Error loading ribbon: " + ex.Message);
+                return null;
             }
         }
 
-        public void Ribbon_Load(IRibbonUI ribbonUI)
+        public void OnLoad(IRibbonUI ribbonUI)
         {
             this.ribbon = ribbonUI;
         }
 
-        public void OnCompareClick(IRibbonControl control)
-        {
-            MessageBox.Show("Compare button clicked!");
-            new SimilarityForm().ShowDialog(); // Make sure SimilarityForm inherits from Form
-        }
+        // You can add button callback methods here too
     }
 }
