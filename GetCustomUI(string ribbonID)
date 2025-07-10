@@ -16,25 +16,27 @@ namespace UserStorySimilarityAddIn
         }
 
         public string GetCustomUI(string ribbonID)
+{
+    MessageBox.Show("GetCustomUI triggered!");
+
+    var assembly = Assembly.GetExecutingAssembly();
+    var resources = assembly.GetManifestResourceNames();
+    MessageBox.Show("Resources:\n" + string.Join("\n", resources));
+
+    foreach (var res in resources)
+    {
+        if (res.Contains("MyRibbonUI")) // ← this is the line you’re updating
         {
-            MessageBox.Show("GetCustomUI triggered!");
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var resources = assembly.GetManifestResourceNames();
-            MessageBox.Show("Resources:\n" + string.Join("\n", resources));
-
-            foreach (var res in resources)
+            using (Stream stream = assembly.GetManifestResourceStream(res))
+            using (StreamReader reader = new StreamReader(stream))
             {
-                if (res.Contains("MvRibbon"))
-                {
-                    using (Stream stream = assembly.GetManifestResourceStream(res))
-                    using (StreamReader reader = new StreamReader(stream))
-                        return reader.ReadToEnd();
-                }
+                var xml = reader.ReadToEnd();
+                MessageBox.Show("Ribbon XML content:\n" + xml); // Optional for debugging
+                return xml;
             }
-
-            MessageBox.Show("MvRibbon.xml not found in resources.");
-            return null;
         }
     }
+
+    MessageBox.Show("MyRibbonUI.xml not found in resources.");
+    return null;
 }
