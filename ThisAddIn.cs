@@ -10,6 +10,10 @@ namespace UserStorySimilarityAddIn
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            // Manual test to invoke and verify ribbon loading
+            ribbon = new MyRibbon();
+            string result = ribbon.GetCustomUI("MyRibbon");
+            System.Windows.Forms.MessageBox.Show("Ribbon XML Loaded:\n\n" + result);
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -32,3 +36,4 @@ namespace UserStorySimilarityAddIn
         #endregion
     }
 }
+
