@@ -1,19 +1,54 @@
-public string GetCustomUI(string ribbonID)
+using System.Reflection;
+using System.IO;
+using System.Windows.Forms;
+using Microsoft.Office.Core;
+
+namespace UserStorySimilarityAddIn
 {
-    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-
-    // Diagnostic: show all resource names
-    var resources = assembly.GetManifestResourceNames();
-    System.Windows.Forms.MessageBox.Show(
-        "Available resources:\n" + string.Join("\n", resources),
-        "Debug: Embedded Resources");
-
-    // ✅ Replace this string with the EXACT match shown in the message box popup
-    string resourceName = "UserStorySimilarityAddIn.MyRibbon.xml";
-
-    using (var stream = assembly.GetManifestResourceStream(resourceName))
-    using (var reader = new System.IO.StreamReader(stream))
+    public class MyRibbon : IRibbonExtensibility
     {
-        return reader.ReadToEnd();
+        private IRibbonUI ribbon;
+
+        public MyRibbon()
+        {
+            // Confirm constructor is triggered
+            MessageBox.Show("Ribbon Constructor Called");
+        }
+
+        public string GetCustomUI(string ribbonID)
+        {
+            try
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                var resources = assembly.GetManifestResourceNames();
+                MessageBox.Show("Embedded Resources:\n" + string.Join("\n", resources));
+
+                using (Stream stream = assembly.GetManifestResourceStream("UserStorySimilarityAddIn.MvRibbon.xml"))
+                {
+                    if (stream == null)
+                    {
+                        MessageBox.Show("Ribbon XML not found!");
+                        return null;
+                    }
+
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Error loading ribbon: " + ex.Message);
+                return null;
+            }
+        }
+
+        public void OnLoad(IRibbonUI ribbonUI)
+        {
+            this.ribbon = ribbonUI;
+        }
+
+        // You can add button callback methods here too
     }
 }
