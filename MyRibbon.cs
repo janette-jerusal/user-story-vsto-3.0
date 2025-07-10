@@ -24,19 +24,19 @@ namespace UserStorySimilarityAddIn
 
             foreach (var res in resources)
             {
-                if (res.Contains("MvRibbon"))
+                if (res.Contains("MyRibbonUI")) // Make sure this matches your XML filename
                 {
                     using (Stream stream = assembly.GetManifestResourceStream(res))
                     using (StreamReader reader = new StreamReader(stream))
                     {
-                        var xml = reader.ReadToEnd();
-                        MessageBox.Show("Ribbon XML loaded:\n\n" + xml);
+                        string xml = reader.ReadToEnd();
+                        MessageBox.Show("Ribbon XML content:\n" + xml); // Optional: for debugging
                         return xml;
                     }
                 }
             }
 
-            MessageBox.Show("MvRibbon.xml not found in embedded resources.");
+            MessageBox.Show("MyRibbonUI.xml not found in resources.");
             return null;
         }
 
@@ -45,7 +45,7 @@ namespace UserStorySimilarityAddIn
             this.ribbon = ribbonUI;
         }
 
-        // 🔘 This connects to the onAction="OnCompareClick" in your XML
+        // Example callback function for the button
         public void OnCompareClick(IRibbonControl control)
         {
             MessageBox.Show("Compare button clicked!");
