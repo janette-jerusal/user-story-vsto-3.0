@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.Office.Core;
@@ -11,7 +13,7 @@ namespace UserStorySimilarityAddIn
 
         public MyRibbon()
         {
-            MessageBox.Show("Ribbon Constructor Called");
+            MessageBox.Show("Ribbon constructor called");
         }
 
         public string GetCustomUI(string ribbonID)
@@ -19,25 +21,23 @@ namespace UserStorySimilarityAddIn
             MessageBox.Show("GetCustomUI triggered");
 
             var assembly = Assembly.GetExecutingAssembly();
-            var resources = assembly.GetManifestResourceNames();
-            MessageBox.Show("Resources:\n" + string.Join("\n", resources));
+            string res = "UserStorySimilarityAddIn.MyRibbonUI.xml";  // Update this if your namespace or filename changes
 
-            foreach (var res in resources)
+            try
             {
-                if (res.Contains("MyRibbonUI"))
+                using (Stream stream = assembly.GetManifestResourceStream(res))
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    using (Stream stream = assembly.GetManifestResourceStream(res))
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        string xml = reader.ReadToEnd();
-                        MessageBox.Show("Ribbon XML content:\n" + xml);
-                        return xml;
-                    }
+                    string xml = reader.ReadToEnd();
+                    MessageBox.Show("Ribbon XML content:\n" + xml); // Debugging
+                    return xml;
                 }
             }
-
-            MessageBox.Show("MyRibbonUI.xml not found in resources.");
-            return null;
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading Ribbon XML: " + ex.Message);
+                return null;
+            }
         }
 
         public void OnLoad(IRibbonUI ribbonUI)
